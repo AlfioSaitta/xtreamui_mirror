@@ -22,7 +22,8 @@ rlibjemalloc = "W1NlcnZpY2VdCkxpbWl0Tk9GSUxFPTY1NTM1MApFbnZpcm9ubWVudD0iTERfUFJF
 
 rVersions = {
     "16.04": "xenial",
-    "18.04": "bionic"
+    "18.04": "bionic",
+    "11": "bullseye"
 }
 
 class col:
@@ -73,14 +74,18 @@ def prepare(rType="MAIN"):
         if rVersion in rVersions:
             #os.system("sudo apt-key adv --fetch-keys 'https://mariadb.org/mariadb_release_signing_key.asc'")
             #https://mariadb.com/kb/en/installing-mariadb-deb-files/
-            os.system("sudo apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xF1656F24C74CD1D8")
-            os.system("sudo add-apt-repository -y 'deb [arch=amd64,arm64,ppc64el] http://ams2.mirrors.digitalocean.com/mariadb/repo/10.5/ubuntu %s main'" % rVersions[rVersion])
-            os.system("apt-get update > /dev/null")
+            if rVersion != "11":
+                os.system("sudo apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xF1656F24C74CD1D8")
+                os.system("sudo add-apt-repository -y 'deb [arch=amd64,arm64,ppc64el] http://ams2.mirrors.digitalocean.com/mariadb/repo/10.5/ubuntu %s main'" % rVersions[rVersion])
+                os.system("apt-get update > /dev/null")
     for rPackage in rPackages:
         printc("Installing %s" % rPackage)
         os.system("apt-get install %s -y > /dev/null" % rPackage)
     printc("Installing libpng")
-    os.system("wget --user-agent=\"Mozilla/5.0\" -q -O /tmp/libpng12.deb http://mirrors.kernel.org/ubuntu/pool/main/libp/libpng/libpng12-0_1.2.54-1ubuntu1_amd64.deb")
+    if rVersion = "11":
+        os.system("wget --user-agent=\"Mozilla/5.0\" -q -O /tmp/libpng12.deb https://snapshot.debian.org/archive/debian/20160413T160058Z/pool/main/libp/libpng/libpng12-0_1.2.54-6_amd64.deb")
+    else:
+        os.system("wget --user-agent=\"Mozilla/5.0\" -q -O /tmp/libpng12.deb http://mirrors.kernel.org/ubuntu/pool/main/libp/libpng/libpng12-0_1.2.54-1ubuntu1_amd64.deb")
     os.system("dpkg -i /tmp/libpng12.deb > /dev/null")
     os.system("apt-get install -y > /dev/null") # Clean up above
     try: os.remove("/tmp/libpng12.deb")
